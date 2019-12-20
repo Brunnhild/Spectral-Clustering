@@ -4,9 +4,14 @@ from sklearn.cluster import SpectralClustering
 from sklearn.manifold import SpectralEmbedding
 import matplotlib.pyplot as plt
 import math
+from MST import mst
 
 
-def spectral_clus(train_data, sigma, k):
+if __name__ == '__main__':
+    train_data = np.array(pd.read_csv('data/iris.csv'))
+    train_data = train_data[:, :-1]
+    sigma = .5
+
     n = train_data.shape[0]
     W = np.zeros((n, n))
 
@@ -14,9 +19,10 @@ def spectral_clus(train_data, sigma, k):
         for j in range(n):
             W[i][j] = math.e ** (-(np.linalg.norm(train_data[i] - train_data[j])) / (2 * sigma ** 2))
 
-    cat = SpectralClustering(k, affinity='precomputed').fit_predict(W)
-    res = SpectralEmbedding(2, affinity='precomputed').fit_transform(W)
-    print(cat)
-    color = np.array(['red', 'green', 'blue', 'purple', 'pink', 'orange'])
-    plt.scatter(res[:, 0], res[:, 1], color=color[cat])
-    plt.show()
+    g = mst(W)
+
+    for item in g:
+        tmp = -1
+        if item.parent != None:
+            tmp = item.parent.index
+        print('The node %d with parent %d and key %f' % (item.index, tmp, item.key))
