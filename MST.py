@@ -7,14 +7,16 @@ class node:
         self.index = index
         self.adj = []
         self.parent = None
-        self.key = float('inf')
+        self.key = 0
 
 
     def __lt__(self, other):
-        bol = self.key < other.key
+        bol = self.key > other.key
         return bol
         
-
+'''
+Prim's Algorithm.
+'''
 def mst(A):
     G = []
     for i in range(A.shape[0]):
@@ -29,13 +31,13 @@ def mst(A):
 
     heap = G
     G = np.array(G)
-    G[0].key = 0
+    G[0].key = float('inf')
     heapq.heapify(heap)
 
     while len(heap) > 0:
         u = heapq.heappop(heap)
         for v in u.adj:
-            if A[u.index][v.index] >= v.key:
+            if A[u.index][v.index] <= v.key:
                 continue
             flag = False
             for tmp in heap:
