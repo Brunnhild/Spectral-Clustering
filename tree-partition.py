@@ -29,7 +29,7 @@ The score of the current graph.
 Target: Maximize the score of the cut.
 '''
 def get_score(W, g, cuts, max_weight, u):
-    alpha = 0.5
+    alpha = 0.3
     weight_score = W[u.parent.index][u.index] / max_weight
 
     counts = []
@@ -59,6 +59,8 @@ def cut_tree(g, cuts):
 if __name__ == '__main__':
     train_data = np.array(pd.read_csv('data/iris.csv'))
     train_data = train_data[:, :-1]
+    # Number of classes to divide.
+    k = 3
 
     sigma = .5
 
@@ -79,8 +81,6 @@ if __name__ == '__main__':
     # inspect(g)
     make_graph(W, g, [], max_weight, name='before')
 
-    # Number of classes to divide.
-    k = 3
     cuts = []
 
     for i in range(k - 1):
