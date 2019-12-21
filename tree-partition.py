@@ -28,16 +28,9 @@ def inspect(g):
 The score of the current graph.
 Target: Maximize the score of the cut.
 '''
-def get_score(W, g, cuts):
-    sum_weights = 0
-    for u in g:
-        if u.parent == None:
-            continue
-        sum_weights += W[u.index][u.parent.index]
-    for u in cuts:
-        if u.parent == None:
-            continue
-        sum_weights -= W[u.parent.index][u.index]
+def get_score(W, g, cuts, max_weight, u):
+    alpha = 0.5
+    weight_score = W[u.parent.index][u.index] / max_weight
 
     counts = []
     total = len(g)
@@ -46,15 +39,15 @@ def get_score(W, g, cuts):
     for u in g:
         counts[u.label] += 1
 
-    partition = 0
-    for item in counts:
-        partition += total / item
-    sum = sum_weights - partition
+    for i in range(len(counts)):
+        counts[i] /= total
+    counts = np.array(counts)
+    partition = np.std(counts) / (math.sqrt(counts.shape[0] - 1) * np.mean(counts))
+    sum = alpha * weight_score + (1 - alpha) * partition
     # print(sum_weights, partition)
     # sum += sum_weights
 
     return sum
-
 
 
 def cut_tree(g, cuts):
@@ -84,23 +77,24 @@ if __name__ == '__main__':
     g = mst(W)
     make_tree(g)
     # inspect(g)
+    make_graph(W, g, [], max_weight, name='before')
 
     # Number of classes to divide.
     k = 3
     cuts = []
 
     for i in range(k - 1):
-        max = -float('inf')
+        min = float('inf')
         cutting = None
         for u in g:
             if u.parent == None:
                 continue
             cuts.append(u)
             cut_tree(g, cuts)
-            tmp = get_score(W, g, cuts)
+            tmp = get_score(W, g, cuts, max_weight, u)
             cuts.pop()
-            if tmp > max:
-                max = tmp
+            if tmp < min:
+                min = tmp
                 cutting = u
         cuts.append(cutting)
         cutting.parent = None
@@ -113,7 +107,7 @@ if __name__ == '__main__':
     res = np.array(res)
 
     inspect(g)
-    make_graph(W, g, cuts)
+    make_graph(W, g, cuts, max_weight, name='after')
 
     color = np.array(['red', 'green', 'blue', 'purple', 'pink', 'orange'])
     plt.scatter(fig[:, 0], fig[:, 1], color=color[res])

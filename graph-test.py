@@ -1,17 +1,19 @@
 from graphviz import Graph
 
-dot = Graph(comment='The Round Table', format='png')
+dot = Graph(comment='The Round Table', format='png', engine='neato')
 
-dot.attr('node', shape='rectangle', color='red')
+dot.attr('node', shape='plaintext', color='red')
 
-dot.node('A', 'King Arthur')
+dot.node('N3')
 
-dot.attr('node', shape='', color='')
 
-dot.node('B', 'Sir Bedevere the Wise')
-dot.node('L', 'Sir Lancelot the Brave')
-dot.edges(['AB', 'AL'])
-dot.edge('B', 'L', constraint='false')
+dot.node('N1')
+dot.node('N2')
+dot.attr('edge', len='1')
+dot.edge('N1', 'N2')
+dot.edge('N2', 'N3')
+dot.attr('edge', len='0.5')
+dot.edge('N1', 'N3', constraint='false')
 
 print(dot.source)
 
