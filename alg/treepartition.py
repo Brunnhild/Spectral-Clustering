@@ -4,10 +4,10 @@ from sklearn.cluster import SpectralClustering
 from sklearn.manifold import SpectralEmbedding
 import matplotlib.pyplot as plt
 import math
-from MST import mst
-from MST import BFS
-from MST import make_tree
-from makegraph import make_graph
+from alg.MST import mst
+from alg.MST import BFS
+from alg.MST import make_tree
+from alg.makegraph import make_graph
 
 
 def inspect(g):
@@ -55,13 +55,7 @@ def cut_tree(g, cuts):
     for i in range(len(cuts)):
         BFS(cuts[i], i + 1)
 
-
-if __name__ == '__main__':
-    train_data = np.array(pd.read_csv('data/iris.csv'))
-    train_data = train_data[:, :-1]
-    # Number of classes to divide.
-    k = 3
-
+def tree_partition(train_data, k):
     sigma = .5
 
     n = train_data.shape[0]
