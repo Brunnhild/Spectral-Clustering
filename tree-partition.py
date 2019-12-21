@@ -19,12 +19,13 @@ def inspect(g):
         if item.label in counts:
             counts[item.label] += 1
         else:
-            counts[item.label] = 0
+            counts[item.label] = 1
     print(counts)
 
 
 '''
 The score of the current graph.
+Target: Maximize the score of the cut.
 '''
 def get_score(W, g, cuts):
     sum_weights = 0
@@ -44,11 +45,12 @@ def get_score(W, g, cuts):
     for u in g:
         counts[u.label] += 1
 
-    sum = 0
+    partition = 0
     for item in counts:
-        sum += item / total
-    sum /= 1
-    sum += sum_weights
+        partition += total / item
+    sum = sum_weights - partition
+    # print(sum_weights, partition)
+    # sum += sum_weights
 
     return sum
 
@@ -61,8 +63,12 @@ def cut_tree(g, cuts):
 
 
 if __name__ == '__main__':
-    train_data = np.array(pd.read_csv('data/iris.csv'))
+    train_data = np.array(pd.read_csv('data/balance-scale.csv'))
+    trans = {'B': 0, 'L': 1, 'R': 2}
+    for i in range(train_data.shape[0]):
+        train_data[i][0] = trans[train_data[i][0]]
     train_data = train_data[:, :-1]
+
     sigma = .5
 
     n = train_data.shape[0]
@@ -83,7 +89,7 @@ if __name__ == '__main__':
     cuts = []
 
     for i in range(k - 1):
-        max = 0
+        max = -float('inf')
         cutting = None
         for u in g:
             if u.parent == None:
