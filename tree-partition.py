@@ -7,6 +7,7 @@ import math
 from MST import mst
 from MST import BFS
 from MST import make_tree
+from makegraph import make_graph
 
 
 def inspect(g):
@@ -63,20 +64,20 @@ def cut_tree(g, cuts):
 
 
 if __name__ == '__main__':
-    train_data = np.array(pd.read_csv('data/balance-scale.csv'))
-    trans = {'B': 0, 'L': 1, 'R': 2}
-    for i in range(train_data.shape[0]):
-        train_data[i][0] = trans[train_data[i][0]]
+    train_data = np.array(pd.read_csv('data/iris.csv'))
     train_data = train_data[:, :-1]
 
     sigma = .5
 
     n = train_data.shape[0]
     W = np.zeros((n, n))
+    max_weight = -float('inf')
 
     for i in range(n):
         for j in range(n):
             W[i][j] = math.e ** (-(np.linalg.norm(train_data[i] - train_data[j])) / (2 * sigma ** 2))
+            if W[i][j] > max_weight:
+                max_weight = W[i][j]
 
     fig = SpectralEmbedding(2, affinity='precomputed').fit_transform(W)
 
@@ -112,6 +113,7 @@ if __name__ == '__main__':
     res = np.array(res)
 
     inspect(g)
+    make_graph(W, g, cuts)
 
     color = np.array(['red', 'green', 'blue', 'purple', 'pink', 'orange'])
     plt.scatter(fig[:, 0], fig[:, 1], color=color[res])
