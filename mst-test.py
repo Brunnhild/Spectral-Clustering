@@ -1,5 +1,7 @@
 from MST import mst
 from MST import node
+from MST import make_tree
+from MST import BFS
 import numpy as np
 import heapq
 
@@ -33,8 +35,10 @@ if __name__ == '__main__':
     print(a)
 
     G = mst(a)
+    make_tree(G)
+    BFS(G[0], 333)
     for item in G:
         tmp = -1
         if item.parent != None:
             tmp = item.parent.index
-        print('The node %d with parent %d and key %f' % (item.index, tmp, item.key))
+        print('The node %d with parent %d and key %f and label %d' % (item.index, tmp, item.key, item.label))

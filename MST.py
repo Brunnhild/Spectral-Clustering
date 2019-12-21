@@ -7,7 +7,9 @@ class node:
         self.index = index
         self.adj = []
         self.parent = None
+        self.children = []
         self.key = 0
+        self.label = -1
 
 
     def __lt__(self, other):
@@ -49,3 +51,22 @@ def mst(A):
                 heapq.heapify(heap)
 
     return G
+
+
+def make_tree(g):
+    for item in g:
+        if item.parent == None:
+            continue
+        else:
+            item.parent.children.append(item)
+
+
+def BFS(n, label):
+    q = [n]
+    while len(q) > 0:
+        tmp = q.pop()
+        tmp.label = label
+        for item in tmp.children:
+            if item.parent == None:
+                continue
+            q.append(item)
