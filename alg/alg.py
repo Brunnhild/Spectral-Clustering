@@ -6,15 +6,13 @@ import matplotlib.pyplot as plt
 import math
 from alg.visualize import visual
 from alg.score import get_cluster_score
+from alg.distance import get_distance
 
 
-def spectral_clus(train_data, sigma, k, v='LE', score=''):
+def spectral_clus(train_data, distance, sigma, k, v='LE', score=''):
     n = train_data.shape[0]
-    W = np.zeros((n, n))
-
-    for i in range(n):
-        for j in range(n):
-            W[i][j] = math.e ** (-(np.linalg.norm(train_data[i] - train_data[j])) / (2 * sigma ** 2))
+    
+    (W, max_weight) = get_distance(train_data, distance)
 
     cat = SpectralClustering(k, affinity='precomputed').fit_predict(W)
     print(cat)
