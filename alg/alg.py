@@ -4,9 +4,11 @@ from sklearn.cluster import SpectralClustering
 from sklearn.manifold import SpectralEmbedding
 import matplotlib.pyplot as plt
 import math
+from alg.visualize import visual
+from alg.score import get_cluster_score
 
 
-def spectral_clus(train_data, sigma, k):
+def spectral_clus(train_data, sigma, k, v='LE', score=''):
     n = train_data.shape[0]
     W = np.zeros((n, n))
 
@@ -15,8 +17,7 @@ def spectral_clus(train_data, sigma, k):
             W[i][j] = math.e ** (-(np.linalg.norm(train_data[i] - train_data[j])) / (2 * sigma ** 2))
 
     cat = SpectralClustering(k, affinity='precomputed').fit_predict(W)
-    res = SpectralEmbedding(2, affinity='precomputed').fit_transform(W)
     print(cat)
-    color = np.array(['red', 'green', 'blue', 'purple', 'pink', 'orange'])
-    plt.scatter(res[:, 0], res[:, 1], color=color[cat])
-    plt.show()
+    get_cluster_score(train_data, W, cat, score)
+    visual(train_data, W, cat, m=v)
+    

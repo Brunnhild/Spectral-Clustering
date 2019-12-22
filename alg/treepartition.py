@@ -1,13 +1,15 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import SpectralClustering
-from sklearn.manifold import SpectralEmbedding
 import matplotlib.pyplot as plt
 import math
 from alg.MST import mst
 from alg.MST import BFS
 from alg.MST import make_tree
 from alg.makegraph import make_graph
+from alg.visualize import visual
+from alg.distance import get_distance
+from alg.score import get_cluster_score
 
 
 def inspect(g):
@@ -28,8 +30,7 @@ def inspect(g):
 The score of the current graph.
 Target: Maximize the score of the cut.
 '''
-def get_score(W, g, cuts, max_weight, u):
-    alpha = 0.3
+def get_score(W, g, cuts, max_weight, u, alpha):
     weight_score = W[u.parent.index][u.index] / max_weight
 
     counts = []
@@ -55,25 +56,14 @@ def cut_tree(g, cuts):
     for i in range(len(cuts)):
         BFS(cuts[i], i + 1)
 
-def tree_partition(train_data, k):
-    sigma = .5
-
-    n = train_data.shape[0]
-    W = np.zeros((n, n))
-    max_weight = -float('inf')
-
-    for i in range(n):
-        for j in range(n):
-            W[i][j] = math.e ** (-(np.linalg.norm(train_data[i] - train_data[j])) / (2 * sigma ** 2))
-            if W[i][j] > max_weight:
-                max_weight = W[i][j]
-
-    fig = SpectralEmbedding(2, affinity='precomputed').fit_transform(W)
+def tree_partition(train_data, k, alpha=0.3, v='LE', graph=True, print_tree=False, distance_method='rbf', score=''):
+    (W, max_weight) = get_distance(train_data, distance_method)
 
     g = mst(W)
     make_tree(g)
     # inspect(g)
-    make_graph(W, g, [], max_weight, name='before')
+    if graph:
+        make_graph(W, g, [], max_weight, name='before')
 
     cuts = []
 
@@ -85,7 +75,7 @@ def tree_partition(train_data, k):
                 continue
             cuts.append(u)
             cut_tree(g, cuts)
-            tmp = get_score(W, g, cuts, max_weight, u)
+            tmp = get_score(W, g, cuts, max_weight, u, alpha)
             cuts.pop()
             if tmp < min:
                 min = tmp
@@ -100,9 +90,11 @@ def tree_partition(train_data, k):
         res.append(u.label)
     res = np.array(res)
 
-    inspect(g)
-    make_graph(W, g, cuts, max_weight, name='after')
+    if print_tree:
+        inspect(g)
+    get_cluster_score(train_data, W, res, score)
 
-    color = np.array(['red', 'green', 'blue', 'purple', 'pink', 'orange'])
-    plt.scatter(fig[:, 0], fig[:, 1], color=color[res])
-    plt.show()
+    if graph:
+        make_graph(W, g, cuts, max_weight, name='after')
+
+    visual(train_data, W, res, m=v)
